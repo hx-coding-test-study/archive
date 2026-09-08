@@ -1,0 +1,45 @@
+name: organize-by-uploader
+
+# 레포 최상위에 올라온 파일을 올린 사람의 GitHub ID 폴더로 자동 이동한다.
+# 폴더가 없으면 만들고, 같은 이름의 파일이 이미 있으면 새 파일로 덮어쓴다.
+# 봇(GITHUB_TOKEN)이 만든 커밋은 워크플로우를 다시 트리거하지 않으므로 무한 루프는 생기지 않는다.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  organize:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Move root files into uploader folder
+        id: move
+        env:
+          UPLOADER: ${{ github.actor }}
+        run: |
+          mkdir -p "$UPLOADER"
+          moved=0
+          for f in *; do
+            [ -f "$f" ] || continue          # 최상위의 "파일"만 대상 (폴더는 건드리지 않음)
+            [ "$f" = "README.md" ] && continue
+            git mv -f "$f" "$UPLOADER/$f"
+            moved=1
+          done
+          echo "moved=$moved" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.move.outputs.moved == '1'
+        env:
+          UPLOADER: ${{ github.actor }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: move root files into $UPLOADER/"
+          git pull --rebase origin main
+          git push origin main
