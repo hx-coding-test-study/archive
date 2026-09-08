@@ -23,11 +23,6 @@ SK하이닉스 코딩 테스트 대비 스터디입니다. **1일 1문제**, 프
 
 체감 난이도는 프로그래머스 Lv1 상위 ~ Lv2 수준이라는 후기가 많습니다. 그래서 커리큘럼도 Lv1으로 시작해 Lv2 완전탐색·시뮬레이션에 비중을 두었습니다.
 
-참고한 후기:
-- [18 하반기 SK하이닉스 1차 코딩 테스트 후기 (goodgid)](https://goodgid.github.io/18-Second-Half-SK-Hynix-1st-Coding-Test/)
-- [SK하이닉스 코딩테스트 관련 문답 (코멘토)](https://comento.kr/job-questions/sk%ED%95%98%EC%9D%B4%EB%8B%89%EC%8A%A4/%EB%AA%A8%EB%93%A0%EC%A7%81%EB%AC%B4/sk%ED%95%98%EC%9D%B4%EB%8B%89%EC%8A%A4%20%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-635714)
-- [회사별 코딩테스트 스타일 및 후기 (velog)](https://velog.io/@soonyoung/%ED%9A%8C%EC%82%AC%EB%B3%84-%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8A%A4%ED%83%80%EC%9D%BC-%EB%B0%8F-%ED%9B%84%EA%B8%B0)
-
 ## 30일 커리큘럼
 
 주차별 주제: 기초 구현 → 문자열 → 완전탐색 → 시뮬레이션 → 자료구조 → 탐색 심화 순서로, 하이닉스 출제 비중이 큰 유형(완전탐색·시뮬레이션·구현)에 시간을 가장 많이 씁니다.
