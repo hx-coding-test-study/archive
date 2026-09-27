@@ -86,6 +86,46 @@ reverse(v.begin(), v.end());       // 뒤집기
 
 for (int x : v) { ... }            // 값 순회
 for (int i = 0; i < v.size(); i++) // 인덱스 순회
+
+v.erase(v.begin() + 1);            // 인덱스 1번 원소 삭제 (뒤 원소 전부 한칸씩 당김, O(n))
+v.erase(v.begin()+1, v.begin()+3); // 인덱스 1,2번 삭제 (3번은 미포함, 파이썬 슬라이스 느낌)
+
+#include <algorithm>
+count(v.begin(), v.end(), 2);      // 2가 몇 번 나오는지 개수 (파이썬 list.count(x))
+find(v.begin(), v.end(), 2) != v.end();  // 2가 있는지 (파이썬 `2 in v`, 없으면 v.end() 반환)
+```
+
+**`begin()` / `end()`가 뭔지 (외우지 말고 이해하기):**
+
+인덱스(정수)가 아니라, 원소를 가리키는 "화살표"(iterator)다. `begin()`은 0번째를 가리키고, `end()`는 마지막 원소 "다음"의 아무것도 없는 자리 — 그냥 "여기서 끝났다"는 표시일 뿐이다.
+
+```cpp
+vector<int> v = {10, 20, 30};
+find(v.begin(), v.end(), 20);   // 찾으면 그 위치(화살표) 반환
+find(v.begin(), v.end(), 99);   // 못 찾으면 v.end() 그대로 반환 (끝까지 갔는데 없더라)
+
+find(v.begin(), v.end(), 20) != v.end();   // bool: 있는지 없는지 (비교해야 bool이 나옴)
+find(v.begin(), v.end(), 20) - v.begin();  // int: 몇 번째에 있는지 (화살표끼리 빼면 인덱스로 변환됨)
+```
+
+- `find()` 자체는 bool도 인덱스도 아니고 **위치(iterator)**를 반환한다. bool이 필요하면 `!= v.end()`로 비교, 인덱스가 필요하면 `- v.begin()`으로 변환해야 한다.
+- `v.erase(v.begin() + i)`의 `v.begin() + i`도 같은 개념: "화살표를 i칸 옮긴 위치" = 인덱스 i번째.
+
+**파이썬 인덱싱/슬라이싱 흉내내기 (C++엔 그런 문법 자체가 없음):**
+
+| 파이썬 | C++ |
+|---|---|
+| `arr[-1]` | ❌ 안 됨(조용히 틀린값 읽음) → `v.back()` |
+| `arr[-2]` | `v[v.size()-2]` |
+| `arr[a:b]` | `vector<int> sub(v.begin()+a, v.begin()+b);` |
+| `arr[:b]` | `vector<int> sub(v.begin(), v.begin()+b);` |
+| `arr[a:]` | `vector<int> sub(v.begin()+a, v.end());` |
+| `arr[::-1]` | `reverse(v.begin(), v.end());` (제자리 뒤집기) |
+
+**`map`/`set`의 `.count(x)`는 개수가 아니라 "있는지(0/1)"만 알려줌** (중복이 없는 자료구조라서):
+```cpp
+set<int> s = {1,2,3};
+s.count(2);   // 1 (있음), s.count(5) // 0 (없음)
 ```
 
 **2차원 vector (격자 문제 필수):**
@@ -94,6 +134,15 @@ vector<vector<int>> grid(n, vector<int>(m, 0));  // n행 m열, 0으로 채움
 grid[i][j] = 5;
 int rows = grid.size(), cols = grid[0].size();
 ```
+
+**왜 저렇게 생겼는지 (외우지 말고 이해하기):**
+
+기본 패턴은 `vector<T>(개수, 채울값)` = "개수만큼 채울값을 복사해서 채워라" 하나뿐이다. 이걸 안쪽→바깥쪽으로 두 번 적용한 것뿐이다.
+
+1. 안쪽 `vector<int>(m, 0)` → "크기 m, 전부 0" = **행 하나** 만들기: `{0,0,...,0}` (m개)
+2. 바깥쪽 `vector<vector<int>>(n, 위에서 만든 행)` → "크기 n, 전부 (그 행)으로 채움" = **그 행을 n개 복사**
+
+결과: n행 × m열, 전부 0. `vector<vector<bool>> visited(n, vector<bool>(m, false));` 도 똑같은 원리 (bool/false만 다름).
 
 ### 2-2. string = 파이썬 str (단, 수정 가능!)
 
@@ -127,16 +176,35 @@ isalpha(c);            // 알파벳인지
 tolower(c); toupper(c);// 대소문자 변환
 ```
 
-### 2-3. pair / tuple (두 값 묶기)
+### 2-3. pair (정확히 2개를 묶기)
+
+`vector`와 달리 **딱 2개만** 담는 상자. 좌표(행,열)처럼 "항상 2개로 고정된 값"에 쓴다.
 
 ```cpp
 #include <utility>
 pair<int,int> p = {3, 5};
-p.first;  p.second;               // 3, 5
-vector<pair<int,int>> vp;
-vp.push_back({1, 2});
+p.first;  p.second;               // 3, 5 (인덱스 아니라 고정된 이름)
+
+vector<pair<int,int>> vp = {{1,2}, {0,3}};   // pair 여러 개 담은 목록 (좌표 리스트)
+vp[0].first;    // 1
+vp[0].second;   // 2
+for (pair<int,int> p : vp) { ... }           // 순회
+
+auto [x, y] = p;   // 구조분해(C++17): first/second를 한번에 변수로 꺼냄 (BFS에서 자주 씀)
+
 // 정렬하면 first 기준 → 같으면 second 기준 자동 정렬
 ```
+
+**`vector` vs `pair` 구분:**
+
+| | `vector<T>` | `pair<T1,T2>` |
+|---|---|---|
+| 담는 개수 | 여러 개 (0개~N개) | 딱 2개 고정 |
+| 접근 방법 | `v[0]`, `v[1]`... (인덱스) | `.first`, `.second` (고정된 이름) |
+| 파이썬 비유 | list | 길이 2인 tuple |
+
+- `vector<int, int>` ← ❌ **문법 자체가 잘못됨.** `vector<>`의 두 번째 자리는 값 타입이 아니라 내부 옵션(allocator) 자리라 컴파일 에러 남. "2개 고정"을 표현하려면 `pair<int,int>`를 쓸 것.
+- 좌표 여러 개를 담고 싶으면 `vector<pair<int,int>>` 또는 `vector<vector<int>>` 둘 다 가능 (편한 거 쓰면 됨).
 
 ### 2-4. map / unordered_map = 파이썬 dict
 
@@ -202,8 +270,7 @@ pq.push(3); pq.top(); pq.pop(); pq.empty();
 sort(v.begin(), v.end());
 max_element(v.begin(), v.end());    // 최댓값 위치 → 값은 *max_element(...)
 min_element(v.begin(), v.end());
-count(v.begin(), v.end(), 3);       // 3의 개수
-find(v.begin(), v.end(), 3);        // 위치 (없으면 v.end())
+// count, find는 2-1(vector) 참고 — begin()/end() iterator 개념도 거기 정리해둠
 reverse(v.begin(), v.end());
 accumulate(v.begin(), v.end(), 0);  // 합 (파이썬 sum) — 세 번째는 시작값
 __gcd(a, b);                        // 최대공약수 (LCM = a/__gcd(a,b)*b)
