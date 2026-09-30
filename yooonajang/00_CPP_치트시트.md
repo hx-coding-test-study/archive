@@ -59,6 +59,14 @@ cout << x << " " << y << "\n";   // 파이썬 print(x, y)
 - `5 / 2` 는 `2` (정수 나눗셈). 실수 원하면 `5.0 / 2`.
 - C++는 변수를 반드시 초기화하자. `int cnt = 0;` (초기화 안 하면 쓰레기값)
 
+**`%`로 패턴 순환시키기 (짧은 패턴을 계속 반복해야 할 때 — 모의고사류):**
+```cpp
+vector<int> pattern = {2,1,2,3,2,4,2,5};   // 길이 8짜리 패턴
+for (int i = 0; i < n; i++) {
+    int cur = pattern[i % pattern.size()];   // i가 패턴 길이를 넘어가면 처음부터 반복
+}
+```
+
 ---
 
 ## 2. 필수 STL (★ 이게 핵심 ★)
@@ -316,6 +324,22 @@ min_element(v.begin(), v.end());
 reverse(v.begin(), v.end());
 accumulate(v.begin(), v.end(), 0);  // 합 (파이썬 sum) — 세 번째는 시작값
 __gcd(a, b);                        // 최대공약수 (LCM = a/__gcd(a,b)*b)
+```
+
+**`max(a,b)` vs `max_element(v.begin(),v.end())` 헷갈리지 말 것:**
+
+| | 대상 | 반환값 |
+|---|---|---|
+| `max(a, b)` | 값 **2개** | 값 그대로 (`*` 필요 없음) |
+| `max_element(begin,end)` | **범위**(vector 전체) | 위치(iterator) → `*` 붙여야 값, `- begin()` 하면 인덱스 |
+
+**주의: `max_element`(`find`도 마찬가지)는 조건에 맞는 것 중 "제일 처음 것" 딱 하나의 위치만 준다.** 최댓값이 여러 개(공동 1등 등)면, `*max_element(...)`로 **값**만 구하고, 그 값과 같은 걸 **직접 for문으로 전부** 찾아야 한다 (모의고사 유형).
+
+```cpp
+int maxScore = *max_element(score.begin(), score.end());
+vector<int> winners;
+for (int i = 0; i < score.size(); i++)
+    if (score[i] == maxScore) winners.push_back(i);   // 공동 1등 전부 수집
 ```
 
 **정렬 커스텀 (람다 = 파이썬 key/lambda):**
