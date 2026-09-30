@@ -24,6 +24,25 @@ int solution(vector<int> arr) {   // 반환 타입/파라미터는 문제가 정
 
 반환 타입 자주 나오는 것: `int`, `long long`, `string`, `vector<int>`, `vector<string>`.
 
+**헤더 요약표 (뭘 쓰든 이 중 하나):**
+
+| 헤더 | 이걸 쓸 때 |
+|---|---|
+| `<vector>` | `vector` |
+| `<string>` | `string`, `stoi`, `to_string` |
+| `<algorithm>` | `sort`, `find`, `count`, `max_element`, `min_element`, `reverse`, `next_permutation`, `max`, `min` |
+| `<utility>` | `pair` (보통 `<vector>`/`<queue>` 등에 딸려와서 안 써도 되는 경우 많음) |
+| `<map>` | `map`, `unordered_map` |
+| `<set>` | `set`, `unordered_set` |
+| `<stack>` | `stack` |
+| `<queue>` | `queue`, `priority_queue` |
+| `<cctype>` | `isdigit`, `isalpha`, `tolower`, `toupper` |
+| `<numeric>` | `accumulate` |
+| `<sstream>` | `stringstream` (문자열 split용) |
+| `<iostream>` | `cout` (디버깅 출력용, 제출 코드엔 없어도 됨) |
+
+헷갈리면 일단 `#include <bits/stdc++.h>` 하나로 전부 해결(모든 표준 헤더를 통째로 불러옴)하는 방법도 있다 — 프로그래머스는 대부분 허용됨. 급하면 이거 하나만 쓰고 시작해도 됨.
+
 디버깅용 출력(제출 코드엔 지워도 됨):
 ```cpp
 #include <iostream>
@@ -197,11 +216,12 @@ to_string(123);        // 숫자 → 문자열 (파이썬 str(123))
 
 **문자(char) 다루기 — 아주 자주 씀:**
 ```cpp
+#include <cctype>   // isdigit, isalpha, tolower, toupper 전부 이 헤더
 char c = '7';
-c - '0';               // 문자 '7' → 숫자 7   (핵심 트릭!)
+c - '0';               // 문자 '7' → 숫자 7   (핵심 트릭! 이건 include 필요 없음, 그냥 뺄셈)
 (char)('0' + 5);       // 숫자 5 → 문자 '5'
-c >= 'a' && c <= 'z';  // 소문자인지
-isdigit(c);            // 숫자 문자인지 (#include <cctype>)
+c >= 'a' && c <= 'z';  // 소문자인지 (이것도 include 필요 없음)
+isdigit(c);            // 숫자 문자인지
 isalpha(c);            // 알파벳인지
 tolower(c); toupper(c);// 대소문자 변환
 ```
@@ -283,6 +303,7 @@ q.push(1); q.front(); q.pop(); q.empty(); q.size();
 
 **stack 실전 패턴 — "방금 넣은 것과 그 아래 것 비교" (크레인 인형뽑기류):**
 ```cpp
+#include <stack>
 stack<int> basket;
 basket.push(3);
 
@@ -336,6 +357,7 @@ __gcd(a, b);                        // 최대공약수 (LCM = a/__gcd(a,b)*b)
 **주의: `max_element`(`find`도 마찬가지)는 조건에 맞는 것 중 "제일 처음 것" 딱 하나의 위치만 준다.** 최댓값이 여러 개(공동 1등 등)면, `*max_element(...)`로 **값**만 구하고, 그 값과 같은 걸 **직접 for문으로 전부** 찾아야 한다 (모의고사 유형).
 
 ```cpp
+#include <algorithm>   // max_element도 sort/find랑 같은 헤더
 int maxScore = *max_element(score.begin(), score.end());
 vector<int> winners;
 for (int i = 0; i < score.size(); i++)
@@ -344,6 +366,7 @@ for (int i = 0; i < score.size(); i++)
 
 **정렬 커스텀 (람다 = 파이썬 key/lambda):**
 ```cpp
+#include <algorithm>   // sort도 여기
 // 내림차순
 sort(v.begin(), v.end(), [](int a, int b){ return a > b; });
 
@@ -356,11 +379,13 @@ sort(vs.begin(), vs.end(), [](const string& a, const string& b){
 
 **순열 완전탐색 (모든 순서 다 보기):**
 ```cpp
+#include <algorithm>   // next_permutation도 sort/find랑 같은 헤더
 sort(v.begin(), v.end());               // 반드시 먼저 정렬!
 do {
     // v의 현재 순열로 뭔가 한다
 } while (next_permutation(v.begin(), v.end()));
 ```
+값이 같은 원소가 있으면 `next_permutation`이 중복 순열을 알아서 건너뛴다 (값 비교 기반이라 별도 처리 불필요).
 
 ---
 
@@ -406,7 +431,9 @@ void dfs(int x, int y) {
 ### 4-3. BFS (최단거리는 무조건 BFS)
 
 ```cpp
-#include <queue>
+#include <queue>       // queue<pair<int,int>>
+#include <vector>      // dist 배열
+// pair는 <utility> 소속이지만 보통 <queue>/<vector>가 알아서 딸려옴. 안 되면 #include <utility> 추가.
 int bfs(int sx, int sy) {
     queue<pair<int,int>> q;
     vector<vector<int>> dist(n, vector<int>(m, -1));  // -1 = 미방문
