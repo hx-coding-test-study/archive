@@ -144,6 +144,28 @@ int rows = grid.size(), cols = grid[0].size();
 
 결과: n행 × m열, 전부 0. `vector<vector<bool>> visited(n, vector<bool>(m, false));` 도 똑같은 원리 (bool/false만 다름).
 
+### 2-1a. 참조(`&`) — for문/함수에서 원본을 진짜로 수정하기
+
+**`for (vector<int> v : board)` (& 없이)는 `board`의 각 행을 "복사"해서 도는 것.** `v`를 아무리 고쳐도 `board` 원본은 그대로다. `v[i]=0` 해도 원본은 안 바뀐다 — **크레인 인형뽑기에서 자주 하는 실수.**
+
+```cpp
+for (vector<int>& v : board) {   // & 붙여야 진짜 board를 수정 가능
+    v[0] = 0;   // 이제 board 원본이 바뀜
+}
+```
+
+**왜 이렇게 되는지:** `&`는 포인터가 아니라 "원본의 또 다른 이름(별명)"이다. `int& d = c;` 하면 `d`랑 `c`는 완전히 같은 상자를 가리키는 두 이름일 뿐이라, `d`를 고치면 `c`도 (애초에 같은 것이므로) 같이 바뀐다. `&` 없이 대입하면 새 상자를 만들어 값만 복사하니, 서로 남남이 된다.
+
+```cpp
+int a = 5;
+int b = a;    // 복사: b를 바꿔도 a는 그대로
+int& c = a;   // 참조: c는 a의 별명, c를 바꾸면 a도 바뀜
+```
+
+**파이썬과 다른 점 (중요):** 파이썬은 기본이 참조라서(변수가 전부 "이름표"), `for row in board: row[0]=0` 하면 **자동으로 원본이 바뀐다.** C++는 기본이 복사라서, 원본을 바꾸려면 `&`를 **명시적으로** 써야 한다.
+
+> 파이썬 에러 "반복 중 리스트/딕셔너리 크기 변경" (`dictionary changed size during iteration` 등)은 이거랑 다른 얘기다 — 그건 반복 도중 **원소 개수(구조)**를 바꿀 때 나는 에러고, `v[i]=0`처럼 **이미 있는 값만 바꾸는 것**은 파이썬/C++ 둘 다 안전하다.
+
 ### 2-2. string = 파이썬 str (단, 수정 가능!)
 
 ```cpp
@@ -241,12 +263,32 @@ for (int x : s) { ... }   // 오름차순으로 순회됨
 #include <stack>
 stack<int> st;
 st.push(1); st.top(); st.pop(); st.empty(); st.size();
-// LIFO: 짝 맞추기(괄호), 최근 것 되돌리기
+// LIFO(나중에 넣은 게 먼저 나옴): 짝 맞추기(괄호), 최근 것 되돌리기, "바구니"류 문제
 
 #include <queue>
 queue<int> q;
 q.push(1); q.front(); q.pop(); q.empty(); q.size();
-// FIFO: BFS, 순서대로 처리(프린터/트럭)
+// FIFO(먼저 넣은 게 먼저 나옴): BFS, 순서대로 처리(프린터/트럭)
+```
+
+**주의**: `queue`는 `front()`로 맨 앞을 보고, `stack`은 `top()`으로 맨 위를 본다 — 이름이 달라서 헷갈리기 쉽다. 둘 다 `pop()`은 반환값이 없다(값을 보려면 먼저 `front()`/`top()`으로 보고 나서 `pop()`).
+
+**stack 실전 패턴 — "방금 넣은 것과 그 아래 것 비교" (크레인 인형뽑기류):**
+```cpp
+stack<int> basket;
+basket.push(3);
+
+if (basket.size() >= 2) {
+    int x = basket.top();   // 방금 넣은 것
+    basket.pop();
+    int y = basket.top();   // 그 바로 아래 것
+
+    if (x == y) {
+        basket.pop();       // 같으면 둘 다 제거
+    } else {
+        basket.push(x);     // 다르면 되돌리기 (뺐던 걸 다시 넣음)
+    }
+}
 ```
 
 ### 2-7. priority_queue (우선순위 큐 = 힙)
