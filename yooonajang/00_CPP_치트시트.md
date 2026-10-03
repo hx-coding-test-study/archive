@@ -76,6 +76,9 @@ cout << x << " " << y << "\n";   // 파이썬 print(x, y)
 **타입 함정 (파이썬 습관 때문에 잘 틀림):**
 - `int`는 약 ±21억까지. 합이 커질 것 같으면 `long long` 사용. (`int`끼리 곱하면 오버플로 조심)
 - `5 / 2` 는 `2` (정수 나눗셈). 실수 원하면 `5.0 / 2`.
+- 변수끼리 나눌 땐 **하나만** 바로 앞에 `(double)` 붙이기: `(double)a / b` ✅ / `1.0 * a / b` ✅ / `(double)(a / b)` ❌ (괄호 안에서 int 나눗셈이 먼저 끝나서 소용없음)
+- `double` **0 / 0은 안 죽고 `nan`**이 나옴. `nan`은 어떤 비교도 `false`라서 `sort`가 깨짐 → 나누기 전에 분모 0인지 꼭 체크 (실패율 문제).
+- `float` 말고 `double` 쓰기 (float는 소수점 7자리 정도라 정밀도 부족).
 - C++는 변수를 반드시 초기화하자. `int cnt = 0;` (초기화 안 하면 쓰레기값)
 
 **`%`로 패턴 순환시키기 (짧은 패턴을 계속 반복해야 할 때 — 모의고사류):**
@@ -364,18 +367,61 @@ for (int i = 0; i < score.size(); i++)
     if (score[i] == maxScore) winners.push_back(i);   // 공동 1등 전부 수집
 ```
 
-**정렬 커스텀 (람다 = 파이썬 key/lambda):**
-```cpp
-#include <algorithm>   // sort도 여기
-// 내림차순
-sort(v.begin(), v.end(), [](int a, int b){ return a > b; });
+**정렬 커스텀 — 방법 1: 음수 트릭 (compare 없이, 제일 쉬움)**
 
-// 문자열 길이 순, 같으면 사전순
+`pair`는 그냥 `sort`해도 **first 오름차순 → 같으면 second 오름차순**으로 정렬된다. 내림차순 원하는 값에 `-`만 붙여서 넣으면 됨.
+```cpp
+#include <algorithm>
+vector<pair<double,int>> v;
+v.push_back({-실패율, 번호});   // 실패율 내림차순, 번호 오름차순
+sort(v.begin(), v.end());
+for (auto p : v) answer.push_back(p.second);
+```
+
+**정렬 커스텀 — 방법 2: compare 함수 (기준이 여러 개거나 음수로 안 될 때)**
+
+`compare(a, b)`가 `true` = **"a가 b보다 앞에 온다"**. `sort`는 두 개씩 꺼내서 이 함수에 물어보고 그 답대로 자리를 정한다. 즉 `return` 뒤에 **"a가 앞에 오려면 a가 어때야 하는지"**를 쓴다.
+- 큰 게 앞 (내림차순) → `return a > b;`
+- 작은 게 앞 (오름차순) → `return a < b;`
+
+```cpp
+#include <algorithm>
+
+// ✅ solution 바깥(위)에 써야 함. C++는 함수 안에 함수를 못 만듦 → 안에 쓰면 컴파일 에러
+bool compare(pair<double,int> a, pair<double,int> b) {
+    if (a.first != b.first) return a.first > b.first;   // 1순위: 다르면 이걸로 결정 (실패율 큰 게 앞)
+    return a.second < b.second;                         // 2순위: 같을 때만 여기 옴 (번호 작은 게 앞)
+}
+
+vector<int> solution(...) {
+    sort(v.begin(), v.end(), compare);   // 함수 이름만, () 없이
+}
+```
+
+기준이 3개 이상이면 `if (!=) return` 줄을 계속 이어 붙이고, 마지막 기준만 `if` 없이 `return`:
+```cpp
+bool compare(Person a, Person b) {
+    if (a.score != b.score) return a.score > b.score;   // 점수 큰 게 앞
+    if (a.age != b.age)     return a.age < b.age;       // 나이 작은 게 앞
+    return a.name < b.name;                             // 이름 사전순
+}
+```
+- `return`에서 함수가 끝나니까 `else` 필요 없음.
+- `==` 버전(`if (a.first == b.first) return 2순위; return 1순위;`)도 같은 뜻이지만, 기준 3개 이상이면 `!=` 버전이 훨씬 편함.
+
+**compare 주의:**
+- **`>=`, `<=` 절대 금지.** 같을 때 `true`가 나오면 정렬이 깨지거나 런타임 에러.
+- 같은 값끼리 **원래 입력 순서 유지**해야 하면 `stable_sort(v.begin(), v.end(), compare);`
+- 원소가 크면(`string` 등) `const pair<double,int>& a`처럼 `const &`로 받으면 복사 안 해서 빠름 (안 해도 보통 통과).
+
+**방법 3: 람다** — compare 함수를 sort 안에 바로 써넣은 것. 뜻은 방법 2랑 똑같음.
+```cpp
 sort(vs.begin(), vs.end(), [](const string& a, const string& b){
-    if (a.size() != b.size()) return a.size() < b.size();
-    return a < b;
+    if (a.size() != b.size()) return a.size() < b.size();   // 길이 짧은 게 앞
+    return a < b;                                           // 같으면 사전순
 });
 ```
+파이썬 `sorted(v, key=lambda x: (-x[0], x[1]))`와 같은 결과.
 
 **순열 완전탐색 (모든 순서 다 보기):**
 ```cpp
