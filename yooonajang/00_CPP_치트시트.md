@@ -27,19 +27,33 @@ int solution(vector<int> arr) {   // 반환 타입/파라미터는 문제가 정
 **시험 시작하면 문제마다 맨 위에 이거 통째로 붙여넣기** (안 쓰는 헤더가 있어도 에러 안 남):
 ```cpp
 #include <string>      // string, stoi, to_string, substr
+//   string s = "abc";  int n = stoi("12");  string t = to_string(12);  s.substr(1, 2) → "bc"
 #include <vector>      // vector
+//   vector<int> v = {3,1,2};  v.push_back(4);  v.back();  vector<vector<int>> g(n, vector<int>(m, 0));
+#include <utility>     // pair, make_pair
+//   pair<int,int> p = {1,2};  p = make_pair(1,2);  p.first, p.second
 #include <algorithm>   // sort, find, count, max_element, min_element, reverse, next_permutation, max, min
+//   sort(v.begin(), v.end());  find(v.begin(), v.end(), x) != v.end();  *max_element(v.begin(), v.end());
 #include <stack>       // stack
+//   stack<int> st;  st.push(1);  st.top();  st.pop();  st.empty();
 #include <queue>       // queue, priority_queue
+//   queue<int> q;  q.push(1);  q.front();  q.pop();     priority_queue<int> pq;  pq.top();  (최대힙)
 #include <map>         // map
+//   map<string,int> m;  m["a"]++;  m.count("a");  for (auto& [k, val] : m)
 #include <set>         // set
+//   set<int> s;  s.insert(3);  s.count(3);  s.erase(3);
 #include <cctype>      // isdigit, isalpha, tolower, toupper
+//   isdigit('7') → true;  tolower('A') → 'a';  '7' - '0' → 7 (이건 헤더 필요 없음)
 #include <cmath>       // abs, pow, sqrt
+//   abs(-3) → 3;  (int)pow(2, 3) → 8;  sqrt(16) → 4
 #include <numeric>     // accumulate
+//   accumulate(v.begin(), v.end(), 0) → 합계
 #include <iostream>    // cout (디버깅용)
+//   cout << x << " " << y << endl;
 
 using namespace std;
 ```
+`make_pair(1,2)`와 `{1,2}`는 완전히 같음. `push_back(make_pair(a,b))` = `push_back({a,b})`. 짧은 `{}` 쓰면 됨.
 
 **헤더 요약표 (뭘 쓰든 이 중 하나):**
 
@@ -48,7 +62,7 @@ using namespace std;
 | `<vector>` | `vector` |
 | `<string>` | `string`, `stoi`, `to_string` |
 | `<algorithm>` | `sort`, `find`, `count`, `max_element`, `min_element`, `reverse`, `next_permutation`, `max`, `min` |
-| `<utility>` | `pair` (보통 `<vector>`/`<queue>` 등에 딸려와서 안 써도 되는 경우 많음) |
+| `<utility>` | `pair`, `make_pair` (보통 `<vector>`/`<queue>` 등에 딸려와서 안 써도 되는 경우 많음) |
 | `<map>` | `map`, `unordered_map` |
 | `<set>` | `set`, `unordered_set` |
 | `<stack>` | `stack` |
