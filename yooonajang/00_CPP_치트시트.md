@@ -24,6 +24,23 @@ int solution(vector<int> arr) {   // 반환 타입/파라미터는 문제가 정
 
 반환 타입 자주 나오는 것: `int`, `long long`, `string`, `vector<int>`, `vector<string>`.
 
+**시험 시작하면 문제마다 맨 위에 이거 통째로 붙여넣기** (안 쓰는 헤더가 있어도 에러 안 남):
+```cpp
+#include <string>      // string, stoi, to_string, substr
+#include <vector>      // vector
+#include <algorithm>   // sort, find, count, max_element, min_element, reverse, next_permutation, max, min
+#include <stack>       // stack
+#include <queue>       // queue, priority_queue
+#include <map>         // map
+#include <set>         // set
+#include <cctype>      // isdigit, isalpha, tolower, toupper
+#include <cmath>       // abs, pow, sqrt
+#include <numeric>     // accumulate
+#include <iostream>    // cout (디버깅용)
+
+using namespace std;
+```
+
 **헤더 요약표 (뭘 쓰든 이 중 하나):**
 
 | 헤더 | 이걸 쓸 때 |
